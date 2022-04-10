@@ -52,22 +52,20 @@ end.time - start.time
 Test of plotting peak call beds and bw files in plotgardener
 ```{r}
 library("plotgardener")
+library("plotgardenerData")
 library("org.Hs.eg.db")
 library("TxDb.Hsapiens.UCSC.hg19.knownGene")
-library("plotgardenerData")
-library("AnnotationHub")
 
 data("GM12878_ChIP_CTCF_signal")
 
-#cat /rgs01/project_space/bakergrp/baker_data/bakergrp/internal/3D_consortium/Unaltered_CellLines/ATACseq/processed/nfcore_runs/OMNI_040122/nfcore_hg19/bwa/mergedLibrary/macs/broadPeak/SJHGG031038_C21-LTC77_P12_R1.mLb.clN_peaks.broadPeak |grep chr21 > ATAC-peak_test.bed
-peak <- ("ATAC-peak_test.bed")
-peak_df <- read.table(peak)
+#peak <- ("ATAC-peak_test.bed")
+#peak_df <- read.table(peak)
 ## ATAC label
 bw <- ("/rgs01/project_space/bakergrp/baker_data/bakergrp/internal/3D_consortium/Unaltered_CellLines/ATACseq/processed/nfcore_runs/OMNI_040122/nfcore_hg19/bwa/mergedLibrary/bigwig/SJHGG031038_C21-LTC77_P12_R1.mLb.clN.bigWig")
 
 
 ## Create a plotgardener page
-pageCreate(width = 5, height = 3.25, default.units = "inches")
+pageCreate(width = 5, height = 2.25, default.units = "inches")
 
 ## Text section label
 plotText(label = "A", fontsize = 12,
@@ -107,9 +105,9 @@ plotText(label = "ATAC big wig", fontcolor = "#253494", fontsize = 8,
          x = 1, y = 1, just = c("left","top"), default.units = "inches")
 
 ## Plot ATAC peak calls
-ATAC_peak <- plotRanges(data = peak_df, params = c(params_c, peak_range),
-                         fill = "#253494", linecolor = "#253494",
-                         y = 1.75, height = 0.4)
+# ATAC_peak <- plotRanges(data = peak_df, params = c(params_c, peak_range),
+#                          fill = "#253494", linecolor = "#253494",
+#                          y = 1.75, height = 0.4)
 ## ATAC peak labels label
 plotText(label = "ATAC peaks", fontcolor = "#253494", fontsize = 8,
          x = 1, y = 1.75, just = c("left","top"), default.units = "inches")
@@ -126,5 +124,15 @@ annoGenomeLabel(plot = genes_gm, params = params_c,
 ## Hide page guides
 pageGuideHide()
 
+```
+
+```{r}
+library(ggbio)
+library(BSgenome.Hsapiens.UCSC.hg38)
+bs <- BSgenome.Hsapiens.UCSC.hg38
+gr <- GRanges(seqnames = "chr12",
+              ranges = IRanges(start = c(6522378), end = c(6769097)))
+
+autoplot(bammy, which = gr, bsgenome = bs)
 ```
 

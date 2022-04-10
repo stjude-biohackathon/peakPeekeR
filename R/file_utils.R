@@ -1,4 +1,4 @@
-# Subset and convert BAMs to BigWig.
+# Subset BAMs.
 .subset_bams <- function(trt_bam, ctrl_bam = NULL, chrom = "chr12", start = 6522378, end = 6769097) {
   
   # Get range to subset.
@@ -9,20 +9,17 @@
   
   bammy <- BamFile(trt_bam)
   tmp <- tempdir()
-  ctrl_bw <- paste0(tmp, "/ctrl.bw")
-  trt_bw <- paste0(tmp, "/trt.bw")
+
+  trt_sub <- paste0(tmp, "/trt_sub.bam")
+  ctrl_sub <- NULL
   
   if (!is.null(ctrl_bam)) {
     inny <- BamFile(ctrl_bam)
-    ctrl <- readGAlignments(bammy, param = params)
-    ctrl_cov <- coverage(ctrl)
-    export.bw(ctrl_cov, con = ctrl_bw)
+    ctrl_sub <- paste0(tmp, "/ctrl_sub.bam")
+    ctrl <- filterBam(inny, destination = ctrl_sub, param = params)
   }
   
-  trt <- readGAlignments(bammy, param = params)
-  trt_cov <- coverage(trt)
+  trt <- filterBam(bammy, destination = trt_sub, param = params)
   
-  export.bw(trt_cov, con = trt_bw)
-  
-  return(list("trt" = trt_bw, "ctrl" = ctrl_bw))
+  return(list("trt" = trt_sub, "ctrl" = ctrl_sub))
 }
