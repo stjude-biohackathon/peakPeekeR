@@ -1,0 +1,51 @@
+---
+title: "Using peakPeekeR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using-peakPeekeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(peakPeekeR)
+library(rtracklayer)
+library(Rsamtools)
+library(GenomicAlignments)
+```
+
+## Testing BAM to BigWig and subsetting.
+
+```{r}
+gr <- GRanges(seqnames = "chr12",
+              ranges = IRanges(start = c(6522378), end = c(6769097)))
+
+bammy <- BamFile("~/scratch/tester/A549_H3K27AC.ENCFF872MQN.sorted.bam", index = "~/scratch/tester/A549_H3K27AC.ENCFF872MQN.sorted.bam.bai")
+inny <- BamFile("~/scratch/tester/A549_INPUT.ENCFF928UTV.sorted.bam", index = "~/scratch/tester/A549_INPUT.ENCFF928UTV.sorted.bam.bai")
+
+params <- ScanBamParam(which = gr, what = scanBamWhat())
+
+tmp <- tempdir()
+
+start.time <- Sys.time()
+
+trt <- readGAlignments(bammy, param = params)
+ctrl <- readGAlignments(bammy, param = params)
+
+trt_cov <- coverage(trt)
+ctrl_cov <- coverage(ctrl)
+
+export.bw(trt_cov, con = paste0(tmp, "/trt.bw"))
+export.bw(ctrl_cov, con = paste0(tmp, "/ctrl.bw"))
+
+end.time <- Sys.time()
+end.time - start.time
+```
+
