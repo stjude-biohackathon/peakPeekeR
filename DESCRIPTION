@@ -3,19 +3,21 @@ Type: Package
 Title: Peak Calling Parameter Optimization
 Version: 0.1.0.9000
 Authors@R: c(person("Jared", "Andrews", email="jared.andrews07@gmail.com", role=c("aut", "cre")),
-    person("Lawryn", "Kasper", email="lawryn.kasper@stjude.org", role=c("aut", "cre")),
-    person("Jacob", "Steele", email="jacob.steele@stjude.org", role=c("aut", "cre"))
+    person("Lawryn", "Kasper", email="lawryn.kasper@stjude.org", role=c("aut")),
+    person("Jacob", "Steele", email="jacob.steele@stjude.org", role=c("aut")))
 Description: Performs peak calling on small regions of ChIP-seq, ATAC-seq, CUTNRUN, or other 
     signal pile-up data while allowing for quick parameter optimization and real-time visualization of the results.
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
+License: MIT + file LICENSE
 Imports:
     basilisk,
     ggbio,
     shiny,
     BSgenome.Hsapiens.UCSC.hg38,
-    GenomicRanges
+    GenomicRanges,
+    Rsamtools
 Suggests: 
     rmarkdown,
     knitr
