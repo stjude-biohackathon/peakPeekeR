@@ -12,9 +12,10 @@ LazyData: true
 RoxygenNote: 7.1.2
 Imports:
     basilisk,
-    plotgardener,
+    ggbio,
     shiny,
-    BSgenome.Hsapiens.UCSC.hg38
+    BSgenome.Hsapiens.UCSC.hg38,
+    GenomicRanges
 Suggests: 
     rmarkdown,
     knitr

@@ -9,6 +9,7 @@
 #' @importFrom ggbio autoplot tracks
 #' @import shiny
 #' @import BSgenome.Hsapiens.UCSC.hg38
+#' @importFrom GenomicRanges GRanges
 peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
   ui <- fluidPage(
     titlePanel("peakPeekeR"),
@@ -40,25 +41,37 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
              plotOutput("signal_plot", height = 150)
       )
     ),
-    hr()
+    hr(),
+    macs2UI("macs2")
+    
   )
   
   server <- function(input, output, session) {
     
+    bams <- reactive({
+      .subset_bams(trt_bam = trt_bam, ctrl_bam = ctrl_bam, 
+                   chrom = input$chrom, start = input$start, end = input$end)
+    })
+    
+    #locs <- reactiveValues(chrom = input$chrom, start = input$start, end = input$end)
+    
+    chrom <- reactive({input$chrom})
+    start <- reactive({input$start})
+    end <- reactive({input$end})
+    
     output$signal_plot <- renderPlot(height = 150, {
       bs <- BSgenome.Hsapiens.UCSC.hg38
       
-      bams <- .subset_bams(trt_bam = trt_bam, ctrl_bam = ctrl_bam, 
-                              chrom = input$chrom, start = input$start, end = input$end)
+      bamz <- bams()
       
       gr <- GRanges(seqnames = input$chrom,
                     ranges = IRanges(start = c(input$start), end = c(input$end)))
       
       # Plotting code.
-      trt.track <- autoplot(bams$trt, which = gr, bsgenome = bs)
+      trt.track <- autoplot(bamz$trt, which = gr, bsgenome = bs)
       
-      if (!is.null(bams$ctrl)) {
-        ctrl.track <- autoplot(bams$ctrl, which = gr, bsgenome = bs)
+      if (!is.null(bamz$ctrl)) {
+        ctrl.track <- autoplot(bamz$ctrl, which = gr, bsgenome = bs)
         
         tks <- tracks(Treat = trt.track, Control = ctrl.track, 
                       heights = c(0.5, 0.5)) + theme_clear()
@@ -70,8 +83,10 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       }
       
       tks
-      
     })
+    
+    macs2Server("macs2", trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
+                chrom = reactive(input$chrom), start = reactive(input$start), end = reactive(input$end))
     
   }
   
