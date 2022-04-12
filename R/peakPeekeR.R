@@ -22,7 +22,13 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
   ui <- fluidPage(
     titlePanel("peakPeekeR"),
     tags$head(
-      tags$style(HTML("hr {border-top: 1px solid #000000;}"))
+      tags$style(HTML("
+                      hr {border-top: 1px solid #000000;
+                          margin: 5px 0px 15px 0px;}
+                      h4 {margin: 0px;
+                          padding: 0px;
+                          font-weight: bold;}
+                      "))
     ),
     fluidRow(
       column(6, wellPanel(
@@ -70,7 +76,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       )
     ),
     hr(),
-    actionButton("add", "Add Peak Caller Instance", icon = icon("plus")),
+    actionButton("add", "Add Peak Caller Instance", icon = icon("plus"), class='btn-success'),
     macs2UI("macs2")
     
   )
@@ -115,7 +121,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         
         footer = tagList(
           modalButton("Cancel"),
-          actionButton("ok", "Add")
+          actionButton("ok", "Add", class='btn-success')
         )
       )
     }

@@ -33,7 +33,7 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                        n = id)
       })
       
-      output$peaks <- renderPlot(height = 175, {
+      output$peaks <- renderPlot(height = 200, {
         req(peak.call())
         df <- read.delim(peak.call()$peaks, header = FALSE)
         
@@ -49,103 +49,120 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
         gr <- subsetByOverlaps(gr, loc)
         
         tr <- autoplot(gr, aes_string(fill = "score")) + theme_clear()
-
+        
         if (!is.null(ctrl_track())) {
-          tracks <- c(Control = ctrl_track(), Treat = trt_track(), MACS2 = tr)
+          tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), MACS2 = tr)
         } else {
           tracks <- c(Treat = trt_track(), MACS2 = tr)
         }
         
-        tracks(tracks, heights = c(0.4,0.8,0.4)) + theme_clear()
+        tracks(tracks, heights = c(0.4,0.8,0.5)) + theme_clear()
       })
       
       output[["macs2"]] <- renderUI({
         ns <- session$ns
         tags$div(
           id = environment(ns)[["namespace"]],
-            tagList(
-             fluidRow(
-               column(6, 
-                wellPanel(h4("MACS2"),
-                  splitLayout(
-                    selectInput(ns("f"),
-                                label = "-f (Paired/Single End)",
-                                selected = "BAM",
-                                choices = c("BAM", "BAMPE")
-                    ),
-                    checkboxInput(ns("broad"),
-                                  label = "--broad (call broad peaks)",
-                                  value = FALSE
-                    ),
-                    numericInput(ns("g"),
-                                 label = "-g (Genome Size)",
-                                 value = 2700000000,
-                                 min = 1
-                    ),
-                    numericInput(ns("extsize"),
-                                 label = "--extsize",
-                                 value = 150
-                    ),
-                    numericInput(ns("shift"),
-                                 label = "--shift",
-                                 value = 75
-                    )
-                  ),
-                  splitLayout(
-                    numericInput(ns("q"),
-                                 label = "-q",
-                                 value = 0.05,
-                                 min = 0.00000000000001
-                    ),
-                    numericInput(ns("p"),                         
-                                 label = "-p",
-                                 value = 1,
-                                 min = 0.000000000001
-                    ),
-                    numericInput(ns("min.length"),
-                                 label = "--min-length",
-                                 value = 0
-                    ),
-                    numericInput(ns("max.gap"),
-                                 label = "--max-gap",
-                                 value = 0
-                    ),
-                    numericInput(ns("broad.cutoff"),
-                                 label = "--broad-cutoff",
-                                 value = 0.1,
-                                 min = 0.00000000000001
-                    )
-                  ),
-                  splitLayout(
-                    numericInput(ns("slocal"),
-                                 label = "--slocal",
-                                 value = 1000
-                    ),
-                    numericInput(ns("llocal"),
-                                 label = "--llocal",
-                                 value = 10000
-                    ),
-                    checkboxInput(ns("no.lambda"),
-                                  label = "--nolambda",
-                                  value = FALSE
-                    )
-                  ),
-                  splitLayout(
-                    actionButton(ns("run"), label = "Run MACS2"),
-                    actionButton(ns("deleteButton"),
-                                 "Delete",
-                                 icon = shiny::icon("times"))
-                  )
-                )
-              ),
-              column(6,
-                    plotOutput(ns("peaks"), height = 175)
+          tagList(
+            fluidRow(
+              column(12, 
+                     wellPanel(
+                       fluidRow(
+                         column(12,
+                                div(h4("MACS2"), style = 'float:left'),
+                                div(actionButton(ns("deleteButton"),
+                                                 "Delete",
+                                                 icon = shiny::icon("times"), class='btn-danger'), style = 'float:right;')
+                         ),
+                         column(12, hr()),
+                         column(5, 
+                                plotOutput(ns("peaks"), height = 200)
+                         ),
+                         column(7,
+                                column(3,
+                                       numericInput(ns("g"),
+                                                    label = "g",
+                                                    value = 2700000000,
+                                                    min = 1
+                                       ),
+                                       numericInput(ns("broad.cutoff"),
+                                                    label = "broad-cutoff",
+                                                    value = 0.1,
+                                                    min = 0.00000000000001
+                                       ),
+                                       checkboxInput(ns("no.lambda"),
+                                                     label = "nolambda",
+                                                     value = FALSE
+                                       ),
+                                       checkboxInput(ns("broad"),
+                                                     label = "broad",
+                                                     value = FALSE
+                                       )),
+                                column(3,
+                                       numericInput(ns("extsize"),
+                                                    label = "extsize",
+                                                    value = 150
+                                       ),
+                                       numericInput(ns("min.length"),
+                                                    label = "min-length",
+                                                    value = 0
+                                       ),
+                                       numericInput(ns("slocal"),
+                                                    label = "slocal",
+                                                    value = 1000
+                                       ),
+                                ),
+                                
+                                column(3,
+                                       numericInput(ns("shift"),
+                                                    label = "shift",
+                                                    value = 75
+                                       ),
+                                       numericInput(ns("max.gap"),
+                                                    label = "max-gap",
+                                                    value = 0
+                                       ),
+                                       numericInput(ns("llocal"),
+                                                    label = "llocal",
+                                                    value = 10000
+                                       )
+                                ),
+                                column(3,
+                                       selectInput(ns("f"),
+                                                   label = "f",
+                                                   selected = "BAM",
+                                                   choices = c("BAM", "BAMPE")
+                                       ),
+                                       column(6,
+                                              numericInput(ns("p"),                         
+                                                           label = "p",
+                                                           value = 1,
+                                                           min = 0.000000000001
+                                              ),
+                                       ),
+                                       column(6,
+                                              numericInput(ns("q"),
+                                                           label = "q",
+                                                           value = 0.05,
+                                                           min = 0.00000000000001
+                                              )),
+                                       column(12,
+                                              div(
+                                                actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                                
+                                              )
+                                       )
+                                )
+                         )
+                       )
+                     )
               )
             )
           )
         )
-      })
-      
+        
+      }
+      )
     }
   )
 }
