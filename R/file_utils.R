@@ -1,4 +1,5 @@
-# Subset BAMs.
+#' @importFrom basilisk BasiliskEnvironment
+#' @importFrom Rsamtools ScanBamParam BamFile filterBam scanBamWhat
 .subset_bams <- function(trt_bam, ctrl_bam = NULL, chrom = "chr12", start = 6522378, end = 6769097) {
   
   # Get range to subset.

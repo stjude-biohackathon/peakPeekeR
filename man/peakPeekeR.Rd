@@ -6,6 +6,11 @@
 \usage{
 peakPeekeR(trt_bam, ctrl_bam = NULL)
 }
+\arguments{
+\item{trt_bam}{Path for treatment sample BAM file.}
+
+\item{ctrl_bam}{Optional path to control (input/Igg) BAM file.}
+}
 \value{
 A Shiny app for peak calling parameter optimization.
 }
