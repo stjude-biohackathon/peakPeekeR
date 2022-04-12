@@ -26,18 +26,18 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       column(6, wellPanel(
         h3("Subset Bams"),
         splitLayout(
-          textInput('chrom',
-                    label = 'Chromosome',
+          textInput("chrom",
+                    label = "Chromosome",
                     value = "chr12"
           ),
           
-          numericInput('start',
+          numericInput("start",
                     label = "Start Position",
                     value = 6522378,
                     min = 1
           ),
           
-          numericInput('end',
+          numericInput("end",
                        label = "End Position",
                        value = 6769097,
                        min = 2
@@ -47,18 +47,18 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       column(6,
         wellPanel(h3("Plot Location"),
          splitLayout(
-           textInput('plot.chrom',
-                     label = 'Chromosome',
+           textInput("plot.chrom",
+                     label = "Chromosome",
                      value = "chr12"
            ),
            
-           numericInput('plot.start',
+           numericInput("plot.start",
                         label = "Start Position",
                         value = 6522378,
                         min = 1
            ),
            
-           numericInput('plot.end',
+           numericInput("plot.end",
                         label = "End Position",
                         value = 6769097,
                         min = 2
@@ -68,6 +68,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       )
     ),
     hr(),
+    actionButton("add", "Add Peak Caller Instance", icon = icon("plus")),
     macs2UI("macs2")
     
   )
@@ -99,10 +100,30 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       list(trt = trt.track, ctrl = ctrl.track)
     })
     
-    macs2Server("macs2", trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
-                chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-                end = reactive(input$plot.end),
-                trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+    observeEvent(input$add, {
+      i <- sprintf('%04d', input$add)
+      id <- sprintf('macs2%s', i)
+      
+      insertUI(
+        selector = '#add',
+        where = "beforeBegin",
+        ui = macs2UI(id)
+      )
+      
+      macs2Server(id, trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
+                  chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                  end = reactive(input$plot.end),
+                  trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+      
+      observeEvent(input[[paste0(id, '-deleteButton')]], {
+        removeUI(selector = sprintf('#%s', id))
+        .remove_shiny_inputs(id, input)
+      })
+    })
+    # macs2Server("macs2", trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
+    #             chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+    #             end = reactive(input$plot.end),
+    #             trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
     
   }
   
