@@ -85,24 +85,6 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                                     value = 2700000000,
                                                     min = 1
                                        ),
-                                       numericInput(ns("broad.cutoff"),
-                                                    label = "broad-cutoff",
-                                                    value = 0.1,
-                                                    min = 0.00000000000001
-                                       ),
-                                       checkboxInput(ns("no.lambda"),
-                                                     label = "nolambda",
-                                                     value = FALSE
-                                       ),
-                                       checkboxInput(ns("broad"),
-                                                     label = "broad",
-                                                     value = FALSE
-                                       )),
-                                column(3,
-                                       numericInput(ns("extsize"),
-                                                    label = "extsize",
-                                                    value = 150
-                                       ),
                                        numericInput(ns("min.length"),
                                                     label = "min-length",
                                                     value = 0
@@ -112,11 +94,10 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                                     value = 1000
                                        ),
                                 ),
-                                
                                 column(3,
-                                       numericInput(ns("shift"),
-                                                    label = "shift",
-                                                    value = 75
+                                       numericInput(ns("extsize"),
+                                                    label = "extsize",
+                                                    value = 150
                                        ),
                                        numericInput(ns("max.gap"),
                                                     label = "max-gap",
@@ -127,32 +108,52 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                                     value = 10000
                                        )
                                 ),
+                                
+                                column(3,
+                                       numericInput(ns("shift"),
+                                                    label = "shift",
+                                                    value = 75
+                                       ),
+                                       numericInput(ns("p"),                         
+                                                    label = "p",
+                                                    value = 1,
+                                                    min = 0.000000000001
+                                       ),
+                                       numericInput(ns("broad.cutoff"),
+                                                    label = "broad-cutoff",
+                                                    value = 0.1,
+                                                    min = 0.00000000000001
+                                       )
+                                ),
                                 column(3,
                                        selectInput(ns("f"),
                                                    label = "f",
                                                    selected = "BAM",
                                                    choices = c("BAM", "BAMPE")
                                        ),
-                                       column(6,
-                                              numericInput(ns("p"),                         
-                                                           label = "p",
-                                                           value = 1,
-                                                           min = 0.000000000001
-                                              ),
+                                       
+                                       numericInput(ns("q"),
+                                                    label = "q",
+                                                    value = 0.05,
+                                                    min = 0.00000000000001
                                        ),
                                        column(6,
-                                              numericInput(ns("q"),
-                                                           label = "q",
-                                                           value = 0.05,
-                                                           min = 0.00000000000001
-                                              )),
-                                       column(12,
+                                              checkboxInput(ns("no.lambda"),
+                                                            label = "nolambda",
+                                                            value = FALSE
+                                              ),
+                                              checkboxInput(ns("broad"),
+                                                            label = "broad",
+                                                            value = FALSE
+                                              )
+                                       ),
+                                       column(6,
                                               div(
-                                                actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                                actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;')
                                                 
                                               )
                                        )
-                                )
+                                ),
                          )
                        )
                      )

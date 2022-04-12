@@ -20,8 +20,7 @@
 #' @importFrom uuid UUIDgenerate
 peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
   ui <- fluidPage(
-    
-    titlePanel(title =  div(img(src="assets/horiz_logo.png", height="20%", width="20%"))),
+    titlePanel("peakPeekeR"),
     tags$head(
       tags$style(HTML("
                       hr {border-top: 1px solid #000000;
@@ -77,16 +76,12 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       )
     ),
     hr(),
-    actionButton("add", "Add Peak Caller Instance", icon = icon("plus"), class='btn-success'),
+    actionButton("add", "Add Peak Caller", icon = icon("plus"), class='btn-success'),
     macs2UI("macs2")
     
   )
   
   server <- function(input, output, session) {
-    
-    output$img <- renderUI({
-      tags$img(src = "https://github.com/stjude-biohackathon/peakPeekeR/raw/422e01e0bcc01f3c2b784e7b604c70bb345c077d/man/figures/horiz_logo.png")
-    })
     
     bams <- reactive({
       .subset_bams(trt_bam = trt_bam, ctrl_bam = ctrl_bam, 
