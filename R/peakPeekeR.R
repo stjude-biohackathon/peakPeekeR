@@ -20,7 +20,7 @@
 #' @importFrom uuid UUIDgenerate
 peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
   ui <- fluidPage(
-    titlePanel("peakPeekeR"),
+    titlePanel(title =  div(img(src="man/figures/horiz_logo.png"))),
     tags$head(
       tags$style(HTML("
                       hr {border-top: 1px solid #000000;
