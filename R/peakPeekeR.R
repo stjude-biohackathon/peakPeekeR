@@ -12,8 +12,10 @@
 #' @importFrom ggbio autoplot tracks theme_clear
 #' @import shiny
 #' @import BSgenome.Hsapiens.UCSC.hg38
-#' @importFrom GenomicRanges GRanges 
-#' @importFrom IRanges IRanges
+#' @importFrom GenomicRanges GRanges makeGRangesFromDataFrame
+#' @importFrom IRanges IRanges subsetByOverlaps
+#' @importFrom utils read.delim
+#' @importFrom ggplot2 aes_string
 peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
   ui <- fluidPage(
     titlePanel("peakPeekeR"),

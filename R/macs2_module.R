@@ -84,22 +84,25 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
     function(input, output, session) {
       
       peak.call <- reactive({
+        # Only run when button clicked.
+        input$run
+        
         # Peak calling function.
         .macs2_calling(trt_bam = trt_bam, 
                        ctrl_bam = ctrl_bam, 
-                       f = input$f, 
-                       broad = input$broad, 
-                       g = input$g, 
-                       extsize = input$extsize, 
-                       shift = input$shift, 
-                       q = input$q, 
-                       p = input$p, 
-                       min.length = input$min.length, 
-                       max.gap = input$max.gap, 
-                       broad.cutoff = input$broad.cutoff, 
-                       slocal = input$slocal, 
-                       llocal = input$llocal, 
-                       no.lambda = input$no.lambda, 
+                       f = isolate(input$f), 
+                       broad = isolate(input$broad), 
+                       g = isolate(input$g), 
+                       extsize = isolate(input$extsize), 
+                       shift = isolate(input$shift), 
+                       q = isolate(input$q), 
+                       p = isolate(input$p), 
+                       min.length = isolate(input$min.length), 
+                       max.gap = isolate(input$max.gap), 
+                       broad.cutoff = isolate(input$broad.cutoff), 
+                       slocal = isolate(input$slocal), 
+                       llocal = isolate(input$llocal), 
+                       no.lambda = isolate(input$no.lambda), 
                        outdir = tempdir(), 
                        n = id)
       })
@@ -107,11 +110,19 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
       output$peaks <- renderPlot(height = 175, {
         req(peak.call())
         df <- read.delim(peak.call()$peaks, header = FALSE)
-        colnames(df) <- c("chrom", "start", "end", "name", "score", "strand", "signal", "p", "q", "peak")
+        
+        if (isolate(input$broad)) {
+          colnames(df) <- c("chrom", "start", "end", "name", "score", "strand", "signal", "p", "q")
+        } else {
+          colnames(df) <- c("chrom", "start", "end", "name", "score", "strand", "signal", "p", "q", "peak")
+        }
+        
         gr <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
         loc <- GRanges(seqnames = chrom(), ranges = IRanges(start = c(start()), end = c(end())))
-        browser()
-        tr <- autoplot(gr, aes(fill = score), which = loc) + theme_clear()
+        
+        gr <- subsetByOverlaps(gr, loc)
+        
+        tr <- autoplot(gr, aes_string(fill = "score")) + theme_clear()
 
         if (!is.null(ctrl_track())) {
           tracks <- c(Control = ctrl_track(), Treat = trt_track(), MACS2 = tr)
@@ -166,7 +177,11 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
     args <- c(args, "-p", p)
   }
   
-  system2("macs2", args = args)
+  cl <- basiliskStart(env_macs2)
+  basiliskRun(cl, function(calling.args) {
+    system2("macs2", args = calling.args)
+  }, calling.args=args)
+  basiliskStop(cl)
   
   if (broad) {
     outfile <- paste0(outdir, "/", n, "_peaks.broadPeak")
@@ -174,7 +189,7 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
     outfile <- paste0(outdir, "/", n, "_peaks.narrowPeak")
   }
   
-  full.cmd <- paste("macs", args)
+  full.cmd <- paste("macs2", args)
   
   return(list(peaks = outfile, cmd = full.cmd))
 }
