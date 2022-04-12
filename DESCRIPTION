@@ -20,7 +20,8 @@ Imports:
     Rsamtools,
     utils,
     IRanges,
-    ggplot2
+    ggplot2,
+    uuid
 Suggests: 
     rmarkdown,
     knitr
