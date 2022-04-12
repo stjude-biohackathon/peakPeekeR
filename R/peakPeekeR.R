@@ -100,30 +100,73 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       list(trt = trt.track, ctrl = ctrl.track)
     })
     
-    observeEvent(input$add, {
-      i <- sprintf('%04d', input$add)
-      id <- sprintf('macs2%s', i)
-      
-      insertUI(
-        selector = '#add',
-        where = "beforeBegin",
-        ui = macs2UI(id)
+    # observeEvent(input$add, {
+    #   i <- sprintf('%04d', input$add)
+    #   id <- sprintf('macs2%s', i)
+    #   
+    #   insertUI(
+    #     selector = '#add',
+    #     where = "beforeBegin",
+    #     ui = macs2UI(id)
+    #   )
+    #   
+    #   macs2Server(id, trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
+    #               chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+    #               end = reactive(input$plot.end),
+    #               trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+    #   
+    #   observeEvent(input[[paste0(id, '-deleteButton')]], {
+    #     removeUI(selector = sprintf('#%s', id))
+    #     .remove_shiny_inputs(id, input)
+    #   })
+    # })
+    
+    # Return the UI for a modal dialog with caller input
+    callerModal <- function() {
+      modalDialog(
+        selectInput("caller", "Choose peak caller",
+                  choices = c("MACS2", "MACS", "SICER2", "Genrich")
+        ),
+        
+        footer = tagList(
+          modalButton("Cancel"),
+          actionButton("ok", "Add")
+        )
       )
-      
-      macs2Server(id, trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
-                  chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-                  end = reactive(input$plot.end),
-                  trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
-      
-      observeEvent(input[[paste0(id, '-deleteButton')]], {
-        removeUI(selector = sprintf('#%s', id))
-        .remove_shiny_inputs(id, input)
-      })
+    }
+    
+    # Show modal when button is clicked.
+    observeEvent(input$add, {
+      showModal(callerModal())
     })
-    # macs2Server("macs2", trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
-    #             chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-    #             end = reactive(input$plot.end),
-    #             trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+    
+    # When OK button is pressed, attempt to load the data set. If successful,
+    # remove the modal. If not show another modal, but this time with a failure
+    # message.
+    observeEvent(input$ok, {
+      removeModal()
+      # Check that data object exists and is data frame.
+      if (input$caller == "MACS2") {
+        i <- sprintf('%04d', input$add)
+        id <- sprintf('macs2%s', i)
+        
+        insertUI(
+          selector = '#add',
+          where = "beforeBegin",
+          ui = macs2UI(id)
+        )
+        
+        macs2Server(id, trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
+                    chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                    end = reactive(input$plot.end),
+                    trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+        
+        observeEvent(input[[paste0(id, '-deleteButton')]], {
+          removeUI(selector = sprintf('#%s', id))
+          .remove_shiny_inputs(id, input)
+        })
+      } 
+    })
     
   }
   
