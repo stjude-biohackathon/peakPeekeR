@@ -16,6 +16,8 @@
 #' @importFrom IRanges IRanges subsetByOverlaps
 #' @importFrom utils read.delim
 #' @importFrom ggplot2 aes_string
+#' @importFrom grid grid.newpage grid.text
+#' @importFrom uuid UUIDgenerate
 peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
   ui <- fluidPage(
     titlePanel("peakPeekeR"),
@@ -80,6 +82,10 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
                    chrom = input$chrom, start = input$start, end = input$end)
     })
     
+    sorted_bams <- reactive({
+      .qname_sort_bams(trt_bam = bams()$trt, ctrl_bam = bams()$ctrl)
+    })
+    
     sig.tracks <- reactive({
       bs <- BSgenome.Hsapiens.UCSC.hg38
       
@@ -100,27 +106,6 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       list(trt = trt.track, ctrl = ctrl.track)
     })
     
-    # observeEvent(input$add, {
-    #   i <- sprintf('%04d', input$add)
-    #   id <- sprintf('macs2%s', i)
-    #   
-    #   insertUI(
-    #     selector = '#add',
-    #     where = "beforeBegin",
-    #     ui = macs2UI(id)
-    #   )
-    #   
-    #   macs2Server(id, trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
-    #               chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-    #               end = reactive(input$plot.end),
-    #               trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
-    #   
-    #   observeEvent(input[[paste0(id, '-deleteButton')]], {
-    #     removeUI(selector = sprintf('#%s', id))
-    #     .remove_shiny_inputs(id, input)
-    #   })
-    # })
-    
     # Return the UI for a modal dialog with caller input
     callerModal <- function() {
       modalDialog(
@@ -140,15 +125,14 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       showModal(callerModal())
     })
     
-    # When OK button is pressed, attempt to load the data set. If successful,
-    # remove the modal. If not show another modal, but this time with a failure
-    # message.
+    # When OK button is pressed, add new peak caller module.
     observeEvent(input$ok, {
       removeModal()
-      # Check that data object exists and is data frame.
+      
+      # Check and add appropriate module.
       if (input$caller == "MACS2") {
         i <- sprintf('%04d', input$add)
-        id <- sprintf('macs2%s', i)
+        id <- sprintf('macs2%s', UUIDgenerate())
         
         insertUI(
           selector = '#add',
@@ -165,7 +149,26 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           removeUI(selector = sprintf('#%s', id))
           .remove_shiny_inputs(id, input)
         })
-      } 
+      } else if (input$caller == "Genrich") {
+        i <- sprintf('%04d', input$add)
+        id <- sprintf('genrich%s', UUIDgenerate())
+        
+        insertUI(
+          selector = '#add',
+          where = "beforeBegin",
+          ui = genrichUI(id)
+        )
+        
+        genrichServer(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
+                    chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                    end = reactive(input$plot.end),
+                    trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+        
+        observeEvent(input[[paste0(id, '-deleteButton')]], {
+          removeUI(selector = sprintf('#%s', id))
+          .remove_shiny_inputs(id, input)
+        })
+      }
     })
     
   }
