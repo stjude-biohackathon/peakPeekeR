@@ -11,7 +11,6 @@
 #' @export
 #' @importFrom ggbio autoplot tracks theme_clear
 #' @import shiny
-#' @import shinyBS
 #' @import BSgenome.Hsapiens.UCSC.hg38
 #' @importFrom GenomicRanges GRanges makeGRangesFromDataFrame
 #' @importFrom IRanges IRanges subsetByOverlaps

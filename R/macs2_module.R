@@ -153,14 +153,6 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                               )
                                        )
                                 )
-                                # column(12,
-                                #        column(4,
-                                #        ),
-                                #        column(4,
-                                #        ),
-                                #        column(4,
-                                #        )
-                                # )
                          )
                        )
                      )
