@@ -77,7 +77,7 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
                                  value = 200
                     ),
                     numericInput(ns("f"),
-                                 label = "-f (fragment size",
+                                 label = "-f (fragment size)",
                                  value = 150
                     )
                   ),
@@ -97,7 +97,7 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
                                  value = 600
                     ),
                     numericInput(ns("e"),
-                                 label = "-e e value",
+                                 label = "-e (e value)",
                                  value = 1000
                     ),
                   ),
@@ -125,27 +125,40 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
 .sicer2_calling <- function(trt_bam, ctrl_bam, s, rt, w, f, egf, 
                            fdr, g, e, outdir) {
   
-  args <- c("sicer", "-t", trt_bam, "-o", outdir)
+  args <- c("-t", paste0(trt_bam,".bed"), "-o", outdir)
   
   # Add control bam if present.
   if (!is.null(ctrl_bam)) {
-    args <- c(args, "-c", ctrl_bam)
+    args <- c(args, "-c", paste0(ctrl_bam,".bed"))
   }
   
   
   # Add args that will always have a value. 
-  args <- c(args, "-s", s, "rt", rt, "w", w, "-f", f, "-egf", egf, "-fdr", fdr, "-g", g, "-e", e)
+  args <- c(args, "-s", s, "-rt", rt, "-w", w, "-f", f, "-egf", egf, "-fdr", fdr, "-g", g, "-e", e)
   
+  browser()
   
   cl <- basiliskStart(env_sicer2)
+  # bamtobed, sicer2 breaks when trying to do this itself.
+  # TODO move outside this module to file utilities function.
   basiliskRun(cl, function(calling.args) {
-    system2("sicer2", args = calling.args)
+    system2("bedtools", args = calling.args)
+  }, calling.args=c("bamtobed", "-i", trt_bam, ">", paste0(trt_bam, ".bed")))
+  
+  if (!is.null(ctrl_bam)) {
+    basiliskRun(cl, function(calling.args) {
+      system2("bedtools", args = calling.args)
+    }, calling.args=c("bamtobed", "-i", ctrl_bam, ">", paste0(ctrl_bam, ".bed")))
+  }
+  
+  basiliskRun(cl, function(calling.args) {
+    system2("sicer", args = calling.args)
   }, calling.args=args)
   basiliskStop(cl)
   
-    outfile <- paste0(outdir, "/",trt_bam, ".", s, "-W200-G600.scoreisland")
+  outfile <- paste0(trt_bam, "-W200-G600.scoreisland")
   
-  full.cmd <- paste("sicer2", args)
+  full.cmd <- paste("sicer", args)
   
   return(list(peaks = outfile, cmd = full.cmd))
 }
