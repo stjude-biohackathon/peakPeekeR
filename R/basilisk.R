@@ -8,7 +8,7 @@ env_macs <- BasiliskEnvironment("env_macs", pkgname="peakPeekeR",
                                 channels=c("bioconda", "conda-forge"))
 
 env_sicer2 <- BasiliskEnvironment("env_sicer2", pkgname="peakPeekeR",
-                                packages=c("sicer2==1.0.3", "python==3.8"),
+                                packages=c("sicer2==1.0.3", "python==3.8", "bedtools=2.30.0"),
                                 channels=c("bioconda", "conda-forge"))
 
 env_genrich <- BasiliskEnvironment("env_genrich", pkgname="peakPeekeR",

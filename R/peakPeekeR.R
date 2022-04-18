@@ -198,6 +198,25 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           removeUI(selector = sprintf('#%s', id))
           .remove_shiny_inputs(id, input)
         })
+      } else if (input$caller == "SICER2") {
+        i <- sprintf('%04d', input$add)
+        id <- sprintf('sicer2%s', UUIDgenerate())
+        
+        insertUI(
+          selector = '#add',
+          where = "beforeBegin",
+          ui = sicer2UI(id)
+        )
+        
+        sicer2Server(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
+                   chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                   end = reactive(input$plot.end),
+                   trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+        
+        observeEvent(input[[paste0(id, '-deleteButton')]], {
+          removeUI(selector = sprintf('#%s', id))
+          .remove_shiny_inputs(id, input)
+        })
       }
     })
     
