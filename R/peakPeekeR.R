@@ -94,6 +94,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
     })
     
     sorted_bams <- reactive({
+      req(bams)
       .qname_sort_bams(trt_bam = bams()$trt, ctrl_bam = bams()$ctrl)
     })
     

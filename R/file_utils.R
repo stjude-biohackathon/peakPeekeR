@@ -1,5 +1,5 @@
 #' @importFrom basilisk BasiliskEnvironment
-#' @importFrom Rsamtools ScanBamParam BamFile filterBam scanBamWhat
+#' @importFrom Rsamtools ScanBamParam BamFile filterBam scanBamWhat sortBam
 .subset_bams <- function(trt_bam, ctrl_bam = NULL, chrom = "chr12", start = 6522378, end = 6769097) {
   
   # Get range to subset.
@@ -38,10 +38,10 @@
   if (!is.null(ctrl_bam)) {
     inny <- BamFile(ctrl_bam)
     ctrl_sub <- paste0(tmp, "/ctrl_sub.sorted.bam")
-    ctrl <- sortBam(inny, destination = ctrl_sub, param = params, byQname = TRUE)
+    ctrl <- sortBam(inny, destination = paste0(tmp, "/ctrl_sub.sorted"), param = params, byQname = TRUE)
   }
   
-  trt <- sortBam(bammy, destination = trt_sub, param = params, byQname = TRUE)
+  trt <- sortBam(bammy, destination = paste0(tmp, "/trt_sub.sorted"), param = params, byQname = TRUE)
   
   return(list("trt" = trt_sub, "ctrl" = ctrl_sub))
 }
