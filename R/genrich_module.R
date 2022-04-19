@@ -33,7 +33,7 @@ genrichServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_t
                          o = paste0(tempdir(), "/", id, ".narrowPeak"))
       })
       
-      output$peaks <- renderPlot(height = 175, {
+      output$peaks <- renderPlot(height = 200, {
         req(peak.call())
         
         out <- tryCatch(
@@ -50,7 +50,7 @@ genrichServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_t
             tr <- autoplot(gr, aes_string(fill = "score")) + theme_clear()
             
             if (!is.null(ctrl_track())) {
-              tracks <- c(Control = ctrl_track(), Treat = trt_track(), Genrich = tr)
+              tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), Genrich = tr)
             } else {
               tracks <- c(Treat = trt_track(), Genrich = tr)
             }
@@ -72,89 +72,100 @@ genrichServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_t
           id = environment(ns)[["namespace"]],
           tagList(
             fluidRow(
-              column(6, 
-                     wellPanel(h4("Genrich"),
-                               splitLayout(
-                                 checkboxInput(ns("r"),
-                                               label = "-r",
-                                               value = FALSE
-                                 ),
-                                 numericInput(ns("m"),
-                                              label = "-m",
-                                              value = 0,
-                                              step = 1
-                                 ),
-                                 numericInput(ns("s"),
-                                              label = "-s",
-                                              value = 0,
-                                              step = 0.1
-                                 ),
-                                 checkboxInput(ns("y"),
-                                               label = "-y",
-                                               value = FALSE
-                                 ),
-                               ),
-                               splitLayout(
-                                 numericInput(ns("w"),
-                                              label = "-w",
-                                              value = 0,
-                                              step = 1
-                                 ),
-                                 checkboxInput(ns("x"),
-                                               label = "-x",
-                                               value = FALSE
-                                 ),
-                                 checkboxInput(ns("j"),
-                                               label = "-j",
-                                               value = FALSE
-                                 ),
-                                 numericInput(ns("d"),
-                                              label = "-d",
-                                              value = 100,
-                                              step = 1
-                                 ),
-                                 checkboxInput(ns("D"),
-                                               label = "-D",
-                                               value = FALSE
-                                 )
-                               ),
-                               splitLayout(
-                                 numericInput(ns("p"),
-                                              label = "-p",
-                                              value = 0.01,
-                                              step = 0.01
-                                 ),
-                                 numericInput(ns("q"),
-                                              label = "-q",
-                                              value = 1,
-                                              step = 0.01
-                                 ),
-                                 numericInput(ns("a"),
-                                              label = "-a",
-                                              value = 200.0,
-                                              step = 0.1
-                                 ),
-                                 numericInput(ns("l"),
-                                              label = "-l",
-                                              value = 0,
-                                              step = 1
-                                 ),
-                                 numericInput(ns("g"),
-                                              label = "-g",
-                                              value = 100,
-                                              step = 1
-                                 )
-                               ),
-                               splitLayout(
-                                 actionButton(ns("run"), label = "Run Genrich"),
-                                 actionButton(ns("deleteButton"),
-                                              "Delete",
-                                              icon = shiny::icon("times"))
-                               )
+              column(12, 
+                     wellPanel(
+                       fluidRow(
+                         column(12,
+                                div(h4("Genrich"), style = 'float:left'),
+                                div(actionButton(ns("deleteButton"),
+                                                 "Delete",
+                                                 icon = shiny::icon("times"), class='btn-danger'), style = 'float:right;')
+                         ),
+                         column(12, hr()),
+                         column(5,
+                                plotOutput(ns("peaks"), height = 200)
+                         ),
+                         column(7,
+                                column(3,
+                                       numericInput(ns("m"),
+                                                    label = "-m",
+                                                    value = 0,
+                                                    step = 1
+                                       ),
+                                       numericInput(ns("s"),
+                                                    label = "-s",
+                                                    value = 0,
+                                                    step = 0.1
+                                       ),
+                                       numericInput(ns("w"),
+                                                    label = "-w",
+                                                    value = 0,
+                                                    step = 1
+                                       ),
+                                ),
+                                column(3,
+                                       numericInput(ns("d"),
+                                                    label = "-d",
+                                                    value = 100,
+                                                    step = 1
+                                       ),
+                                       numericInput(ns("p"),
+                                                    label = "-p",
+                                                    value = 0.01,
+                                                    step = 0.01
+                                       ),
+                                       numericInput(ns("q"),
+                                                    label = "-q",
+                                                    value = 1,
+                                                    step = 0.01
+                                       ),
+                                ),
+                                column(3,
+                                       numericInput(ns("a"),
+                                                    label = "-a",
+                                                    value = 200.0,
+                                                    step = 0.1
+                                       ),
+                                       numericInput(ns("l"),
+                                                    label = "-l",
+                                                    value = 0,
+                                                    step = 1
+                                       ),
+                                       numericInput(ns("g"),
+                                                    label = "-g",
+                                                    value = 100,
+                                                    step = 1
+                                       )
+                                ),
+                                column(3,
+                                       checkboxInput(ns("r"),
+                                                     label = "-r",
+                                                     value = FALSE
+                                       ),
+                                       checkboxInput(ns("y"),
+                                                     label = "-y",
+                                                     value = FALSE
+                                       ),
+                                       checkboxInput(ns("x"),
+                                                     label = "-x",
+                                                     value = FALSE
+                                       ),
+                                       checkboxInput(ns("j"),
+                                                     label = "-j",
+                                                     value = FALSE
+                                       ),
+                                       checkboxInput(ns("D"),
+                                                     label = "-D",
+                                                     value = FALSE
+                                       ),
+                                       div(
+                                         actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                         
+                                       )
+                                )
+                         )
+                       )
                      )
-              ),
-              column(6,
-                     plotOutput(ns("peaks"), height = 175)
               )
             )
           )
@@ -167,7 +178,7 @@ genrichServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_t
 
 # Genrich peak calling function.
 .genrich_calling <- function(t, c, m, s, r, y, w, x, j, d, D,
-                           q, p, l, a, g, o) {
+                             q, p, l, a, g, o) {
   
   args <- c("-t", t, "-o", o)
   
