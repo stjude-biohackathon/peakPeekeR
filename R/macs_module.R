@@ -15,15 +15,15 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
         
         # Peak calling function.
         .macs_calling(trt_bam = trt_bam, 
-                       ctrl_bam = ctrl_bam, 
-                       g = isolate(input$g), 
-                       shiftsize = isolate(input$shiftsize), 
-                       p = isolate(input$p), 
-                       slocal = isolate(input$slocal), 
-                       llocal = isolate(input$llocal), 
-                       no.lambda = isolate(input$no.lambda), 
-                       outdir = tempdir(), 
-                       n = id)
+                      ctrl_bam = ctrl_bam, 
+                      g = isolate(input$g), 
+                      shiftsize = isolate(input$shiftsize), 
+                      p = isolate(input$p), 
+                      slocal = isolate(input$slocal), 
+                      llocal = isolate(input$llocal), 
+                      no.lambda = isolate(input$no.lambda), 
+                      outdir = tempdir(), 
+                      n = id)
       })
       
       output$peaks <- renderPlot(height = 175, {
@@ -39,9 +39,9 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
         gr <- subsetByOverlaps(gr, loc)
         
         tr <- autoplot(gr, aes_string(fill = "score")) + theme_clear()
-
+        
         if (!is.null(ctrl_track())) {
-          tracks <- c(Control = ctrl_track(), Treat = trt_track(), MACS = tr)
+          tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), MACS = tr)
         } else {
           tracks <- c(Treat = trt_track(), MACS = tr)
         }
@@ -53,52 +53,62 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
         ns <- session$ns
         tags$div(
           id = environment(ns)[["namespace"]],
-            tagList(
-             fluidRow(
-               column(6, 
-                wellPanel(h4("MACS"),
-                  splitLayout(
-                    numericInput(ns("g"),
-                                 label = "-g (Genome Size)",
-                                 value = 2700000000,
-                                 min = 1
-                    ),
-                    numericInput(ns("shiftsize"),
-                                 label = "--shiftsize",
-                                 value = 100
-                    )
-                  ),
-                   splitLayout(
-                    numericInput(ns("p"),                         
-                                 label = "-p",
-                                 value = 0.05,
-                                 step = 0.001
-                    )
-                  ),
-                  splitLayout(
-                    numericInput(ns("slocal"),
-                                 label = "--slocal",
-                                 value = 1000
-                    ),
-                    numericInput(ns("llocal"),
-                                 label = "--llocal",
-                                 value = 10000
-                    ),
-                    checkboxInput(ns("no.lambda"),
-                                  label = "--nolambda",
-                                  value = FALSE
-                    )
-                  ),
-                  splitLayout(
-                    actionButton(ns("run"), label = "Run MACS"),
-                    actionButton(ns("deleteButton"),
-                                 "Delete",
-                                 icon = shiny::icon("times"))
-                  )
-                )
-              ),
-              column(6,
-                    plotOutput(ns("peaks"), height = 175)
+          tagList(
+            fluidRow(
+              column(12, 
+                     wellPanel(
+                       fluidRow(
+                         column(12,
+                                div(h4("MACS"), style = 'float:left'),
+                                div(actionButton(ns("deleteButton"),
+                                                 "Delete",
+                                                 icon = shiny::icon("times"), class='btn-danger'), style = 'float:right;')
+                         ),
+                         column(12, hr()),
+                         column(5,
+                                plotOutput(ns("peaks"), height = 200)
+                         ),
+                         column(3,
+                                numericInput(ns("g"),
+                                             label = "-g (Genome Size)",
+                                             value = 250000,
+                                             min = 1
+                                ),
+                                
+                                numericInput(ns("slocal"),
+                                             label = "--slocal",
+                                             value = 1000
+                                )
+                         ),
+                         column(2,
+                                numericInput(ns("shiftsize"),
+                                             label = "--shiftsize",
+                                             value = 100
+                                ),
+                                numericInput(ns("llocal"),
+                                             label = "--llocal",
+                                             value = 10000
+                                ),
+                         ),
+                         column(2,
+                                numericInput(ns("p"),                         
+                                             label = "-p",
+                                             value = 0.2,
+                                             step = 0.001
+                                ),
+                                checkboxInput(ns("no.lambda"),
+                                              label = "--nolambda",
+                                              value = FALSE
+                                ),
+                                div(
+                                  actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                  
+                                )
+                         )
+                       )
+                       
+                       
+                     )
               )
             )
           )
@@ -110,8 +120,8 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
 
 # MACS peak calling function.
 .macs_calling <- function(trt_bam, ctrl_bam, g, shiftsize, 
-                           p, slocal, llocal, 
-                           no.lambda, outdir, n) {
+                          p, slocal, llocal, 
+                          no.lambda, outdir, n) {
   
   args <- c("callpeak", "-t", trt_bam, "--outdir", outdir, "-n", n, "-p", p)
   
@@ -135,7 +145,7 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
   }, calling.args=args)
   basiliskStop(cl)
   
-
+  
   outfile <- paste0(outdir, "/", n, "_peaks.bed")
   
   
