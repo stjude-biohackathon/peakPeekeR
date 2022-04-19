@@ -26,7 +26,7 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
                       n = id)
       })
       
-      output$peaks <- renderPlot(height = 175, {
+      output$peaks <- renderPlot(height = 200, {
         req(peak.call())
         df <- read.delim(peak.call()$peaks, header = FALSE)
         

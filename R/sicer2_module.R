@@ -18,26 +18,26 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
         
         # Peak calling function.
         .sicer2_calling(trt_bam = trt_bam, 
-                       ctrl_bam = ctrl_bam, 
-                       s = "hg38", 
-                       rt = isolate(input$rt),
-                       w = isolate(input$w), 
-                       f = isolate(input$f), 
-                       egf = egf, 
-                       fdr = isolate(input$fdr), 
-                       g = isolate(input$g), 
-                       e = isolate(input$e), 
-                       outdir = tempdir()
-                       )
+                        ctrl_bam = ctrl_bam, 
+                        s = "hg38", 
+                        rt = isolate(input$rt),
+                        w = isolate(input$w), 
+                        f = isolate(input$f), 
+                        egf = egf, 
+                        fdr = isolate(input$fdr), 
+                        g = isolate(input$g), 
+                        e = isolate(input$e), 
+                        outdir = tempdir()
+        )
       })
       
-      output$peaks <- renderPlot(height = 175, {
+      output$peaks <- renderPlot(height = 200, {
         req(peak.call())
         df <- read.delim(peak.call()$peaks, header = FALSE)
         
-       
+        
         colnames(df) <- c("chrom", "start", "end", "score")
-      
+        
         
         gr <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
         loc <- GRanges(seqnames = chrom(), ranges = IRanges(start = c(start()), end = c(end())))
@@ -45,9 +45,9 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
         gr <- subsetByOverlaps(gr, loc)
         
         tr <- autoplot(gr, aes_string(fill = "score")) + theme_clear()
-
+        
         if (!is.null(ctrl_track())) {
-          tracks <- c(Control = ctrl_track(), Treat = trt_track(), SICER2 = tr)
+          tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), SICER2 = tr)
         } else {
           tracks <- c(Treat = trt_track(), SICER2 = tr)
         }
@@ -59,63 +59,71 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
         ns <- session$ns
         tags$div(
           id = environment(ns)[["namespace"]],
-            tagList(
-             fluidRow(
-               column(6, 
-                wellPanel(h4("SICER2"),
-                  splitLayout(
-                    numericInput(ns("rt"),
-                                 label = "-rt (redundancy threshold)",
-                                 value = 1,
-                                 min = 1
-                    ),
-                    numericInput(ns("w"),
-                                 label = "-w (window size)",
-                                 value = 200
-                    ),
-                    numericInput(ns("f"),
-                                 label = "-f (fragment size)",
-                                 value = 150
-                    )
-                  ),
-                  splitLayout(
-                    numericInput(ns("fdr"),                         
-                                 label = "-fdr (false discovery rate)",
-                                 value = 0.01,
-                                 min = 0.000000000001
-                    ),
-                    numericInput(ns("g"),
-                                 label = "-g (gap size, must be multiple of window size)",
-                                 value = 600
-                    ),
-                    numericInput(ns("e"),
-                                 label = "-e (e value)",
-                                 value = 1000
-                    ),
-                  ),
-                  splitLayout(
-                    actionButton(ns("run"), label = "Run SICER2"),
-                    actionButton(ns("deleteButton"),
-                                 "Delete",
-                                 icon = shiny::icon("times"))
-                  )
-                )
-              ),
-              column(6,
-                    plotOutput(ns("peaks"), height = 175)
+          tagList(
+            fluidRow(
+              column(12, 
+                     wellPanel(
+                       fluidRow(
+                         column(12,
+                                div(h4("SICER2"), style = 'float:left'),
+                                div(actionButton(ns("deleteButton"),
+                                                 "Delete",
+                                                 icon = shiny::icon("times"), class='btn-danger'), style = 'float:right;')
+                         ),
+                         column(12, hr()),
+                         column(5,
+                                plotOutput(ns("peaks"), height = 200)
+                         ),
+                         column(3,
+                                numericInput(ns("rt"),
+                                             label = "-rt (redundancy threshold)",
+                                             value = 1,
+                                             min = 1
+                                ),
+                                numericInput(ns("g"),
+                                             label = "-g (must be multiple of window size)",
+                                             value = 600
+                                ),
+                         ),
+                         column(2,
+                                numericInput(ns("w"),
+                                             label = "-w",
+                                             value = 200
+                                ),
+                                numericInput(ns("f"),
+                                             label = "-f",
+                                             value = 150
+                                )
+                         ),
+                         column(2,
+                                numericInput(ns("fdr"),                         
+                                             label = "-fdr",
+                                             value = 0.01,
+                                             min = 0.000000000001
+                                ),
+                                numericInput(ns("e"),
+                                             label = "-e",
+                                             value = 1000
+                                ),
+                                div(
+                                  actionButton(ns("run"), label = "Run SICER2", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                )
+                         )
+                       )
+                     )
               )
             )
           )
         )
-      })
-      
+      }
+      )
     }
   )
 }
 
 # SICER2 peak calling function.
 .sicer2_calling <- function(trt_bam, ctrl_bam, s, rt, w, f, egf, 
-                           fdr, g, e, outdir) {
+                            fdr, g, e, outdir) {
   
   args <- c("-t", paste0(trt_bam,".bed"), "-o", outdir)
   
