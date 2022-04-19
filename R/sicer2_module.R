@@ -13,14 +13,17 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
         # Only run when button clicked.
         input$run
         
+        # Calculate egf based on bam size. Will use hg38 genome length, doesn't really matter.
+        egf <- (end() - start()) / 3088286401
+        
         # Peak calling function.
         .sicer2_calling(trt_bam = trt_bam, 
                        ctrl_bam = ctrl_bam, 
-                       s = isolate(input$s), 
+                       s = "hg38", 
                        rt = isolate(input$rt),
                        w = isolate(input$w), 
                        f = isolate(input$f), 
-                       egf = isolate(input$egf), 
+                       egf = egf, 
                        fdr = isolate(input$fdr), 
                        g = isolate(input$g), 
                        e = isolate(input$e), 
@@ -61,12 +64,6 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
                column(6, 
                 wellPanel(h4("SICER2"),
                   splitLayout(
-                    selectInput(ns("s"),
-                                label = "-s (species)",
-                                selected = "hg38",
-                                choices = c("hg38", "hg19", "mm10") 
-                    ),
-                 
                     numericInput(ns("rt"),
                                  label = "-rt (redundancy threshold)",
                                  value = 1,
@@ -81,12 +78,7 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
                                  value = 150
                     )
                   ),
-                   splitLayout(
-                    numericInput(ns("egf"),
-                                 label = "-egf (effective genome fraction)",
-                                 value = 0.74,
-                                 min = 0.00000000000001
-                    ),
+                  splitLayout(
                     numericInput(ns("fdr"),                         
                                  label = "-fdr (false discovery rate)",
                                  value = 0.01,
@@ -135,8 +127,6 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
   
   # Add args that will always have a value. 
   args <- c(args, "-s", s, "-rt", rt, "-w", w, "-f", f, "-egf", egf, "-fdr", fdr, "-g", g, "-e", e)
-  
-  browser()
   
   cl <- basiliskStart(env_sicer2)
   # bamtobed, sicer2 breaks when trying to do this itself.
