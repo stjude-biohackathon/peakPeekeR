@@ -159,7 +159,7 @@ genrichServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_t
                                                      value = FALSE
                                        ),
                                        div(
-                                         actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                         actionButton(ns("run"), label = "Run Genrich", class='btn-success', style='margin-top:20px;'), style="float:right;"
                                          
                                        )
                                 )

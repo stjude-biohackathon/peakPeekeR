@@ -101,7 +101,7 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
                                               value = FALSE
                                 ),
                                 div(
-                                  actionButton(ns("run"), label = "Run", class='btn-success', style='margin-top:20px;'), style="float:right;"
+                                  actionButton(ns("run"), label = "Run MACS", class='btn-success', style='margin-top:20px;'), style="float:right;"
                                   
                                 )
                          )
