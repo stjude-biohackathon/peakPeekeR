@@ -41,9 +41,9 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           ),
           
           numericInput("start",
-                    label = "Start Position",
-                    value = 6522378,
-                    min = 1
+                       label = "Start Position",
+                       value = 6522378,
+                       min = 1
           ),
           
           numericInput("end",
@@ -54,30 +54,31 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         )
       )),
       column(6,
-        wellPanel(h3("Plot Location"),
-         splitLayout(
-           textInput("plot.chrom",
-                     label = "Chromosome",
-                     value = "chr12"
-           ),
-           
-           numericInput("plot.start",
-                        label = "Start Position",
-                        value = 6522378,
-                        min = 1
-           ),
-           
-           numericInput("plot.end",
-                        label = "End Position",
-                        value = 6769097,
-                        min = 2
-           )
-         )
-        )
+             wellPanel(h3("Plot Location"),
+                       splitLayout(
+                         textInput("plot.chrom",
+                                   label = "Chromosome",
+                                   value = "chr12"
+                         ),
+                         
+                         numericInput("plot.start",
+                                      label = "Start Position",
+                                      value = 6522378,
+                                      min = 1
+                         ),
+                         
+                         numericInput("plot.end",
+                                      label = "End Position",
+                                      value = 6769097,
+                                      min = 2
+                         )
+                       )
+             )
       )
     ),
     hr(),
-    actionButton("add", "Add Peak Caller Instance", icon = icon("plus"), class='btn-success'),
+    column(12, align='center',
+           actionButton("add", "Add Peak Caller Instance", icon = icon("plus"), class='btn-success')),
     macs2UI("macs2")
     
   )
@@ -122,7 +123,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
     callerModal <- function() {
       modalDialog(
         selectInput("caller", "Choose peak caller",
-                  choices = c("MACS2", "MACS", "SICER2", "Genrich")
+                    choices = c("MACS2", "MACS", "SICER2", "Genrich")
         ),
         
         footer = tagList(
@@ -172,9 +173,9 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         )
         
         genrichServer(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
-                    chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-                    end = reactive(input$plot.end),
-                    trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+                      chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                      end = reactive(input$plot.end),
+                      trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
         
         observeEvent(input[[paste0(id, '-deleteButton')]], {
           removeUI(selector = sprintf('#%s', id))
@@ -191,9 +192,9 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         )
         
         macsServer(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
-                      chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-                      end = reactive(input$plot.end),
-                      trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+                   chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                   end = reactive(input$plot.end),
+                   trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
         
         observeEvent(input[[paste0(id, '-deleteButton')]], {
           removeUI(selector = sprintf('#%s', id))
@@ -210,9 +211,9 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         )
         
         sicer2Server(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
-                   chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
-                   end = reactive(input$plot.end),
-                   trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+                     chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
+                     end = reactive(input$plot.end),
+                     trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
         
         observeEvent(input[[paste0(id, '-deleteButton')]], {
           removeUI(selector = sprintf('#%s', id))
