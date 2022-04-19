@@ -14,8 +14,8 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
         input$run
         
         # Peak calling function.
-        .macs_calling(trt_bam = trt_bam, 
-                      ctrl_bam = ctrl_bam, 
+        .macs_calling(trt_bam = trt_bam(), 
+                      ctrl_bam = ctrl_bam(), 
                       g = isolate(input$g), 
                       shiftsize = isolate(input$shiftsize), 
                       p = isolate(input$p), 

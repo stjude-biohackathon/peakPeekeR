@@ -17,8 +17,8 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
         egf <- (end() - start()) / 3088286401
         
         # Peak calling function.
-        .sicer2_calling(trt_bam = trt_bam, 
-                        ctrl_bam = ctrl_bam, 
+        .sicer2_calling(trt_bam = trt_bam(), 
+                        ctrl_bam = ctrl_bam(), 
                         s = "hg38", 
                         rt = isolate(input$rt),
                         w = isolate(input$w), 

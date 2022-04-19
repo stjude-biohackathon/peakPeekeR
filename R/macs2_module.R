@@ -14,8 +14,8 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
         input$run
         
         # Peak calling function.
-        .macs2_calling(trt_bam = trt_bam, 
-                       ctrl_bam = ctrl_bam, 
+        .macs2_calling(trt_bam = trt_bam(), 
+                       ctrl_bam = ctrl_bam(), 
                        f = isolate(input$f), 
                        broad = isolate(input$broad), 
                        g = isolate(input$g), 

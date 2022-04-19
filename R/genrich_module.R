@@ -14,8 +14,8 @@ genrichServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_t
         input$run
         
         # Peak calling function.
-        .genrich_calling(t = trt_bam, 
-                         c = ctrl_bam, 
+        .genrich_calling(t = trt_bam(), 
+                         c = ctrl_bam(), 
                          m = isolate(input$m), 
                          s = isolate(input$s), 
                          r = isolate(input$r), 

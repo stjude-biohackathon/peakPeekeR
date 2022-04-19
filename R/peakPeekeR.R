@@ -153,7 +153,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           ui = macs2UI(id)
         )
         
-        macs2Server(id, trt_bam = bams()$trt, ctrl_bam = bams()$ctrl, 
+        macs2Server(id, trt_bam = reactive(bams()$trt), ctrl_bam = reactive(bams()$ctrl), 
                     chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                     end = reactive(input$plot.end),
                     trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
@@ -172,7 +172,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           ui = genrichUI(id)
         )
         
-        genrichServer(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
+        genrichServer(id, trt_bam = reactive(sorted_bams()$trt), ctrl_bam = reactive(sorted_bams()$ctrl), 
                       chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                       end = reactive(input$plot.end),
                       trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
@@ -191,7 +191,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           ui = macsUI(id)
         )
         
-        macsServer(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
+        macsServer(id, trt_bam = reactive(bams()$trt), ctrl_bam = reactive(bams()$ctrl), 
                    chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                    end = reactive(input$plot.end),
                    trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
@@ -210,7 +210,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           ui = sicer2UI(id)
         )
         
-        sicer2Server(id, trt_bam = sorted_bams()$trt, ctrl_bam = sorted_bams()$ctrl, 
+        sicer2Server(id, trt_bam = reactive(bams()$trt), ctrl_bam = reactive(bams()$ctrl), 
                      chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                      end = reactive(input$plot.end),
                      trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
