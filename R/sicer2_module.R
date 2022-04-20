@@ -4,7 +4,7 @@ sicer2UI <- function(id) {
   shiny::uiOutput(ns("sicer2"))
 }
 # requires bedtools to use BAM files directly 
-sicer2Server <- function(id, trt_bed, ctrl_bed = NULL, chrom, start, end, trt_track, ctrl_track = NULL) {
+sicer2Server <- function(id, trt_bed, ctrl_bed = NULL, chrom, start, end, trt_track, ctrl_track = NULL, egl) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -14,7 +14,7 @@ sicer2Server <- function(id, trt_bed, ctrl_bed = NULL, chrom, start, end, trt_tr
         input$run
         
         # Calculate egf based on bam size. Will use hg38 genome length, doesn't really matter.
-        egf <- (end() - start()) / 3088286401
+        egf <- egl() / 3088286401
         
         # Peak calling function.
         .sicer2_calling(trt_bed = trt_bed(), 

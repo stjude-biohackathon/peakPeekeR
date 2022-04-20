@@ -4,7 +4,7 @@ macsUI <- function(id) {
   shiny::uiOutput(ns("macs"))
 }
 
-macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_track, ctrl_track = NULL) {
+macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_track, ctrl_track = NULL, egl) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -16,7 +16,7 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
         # Peak calling function.
         .macs_calling(trt_bam = trt_bam(), 
                       ctrl_bam = ctrl_bam(), 
-                      g = isolate(input$g), 
+                      g = egl(), 
                       shiftsize = isolate(input$shiftsize), 
                       p = isolate(input$p), 
                       slocal = isolate(input$slocal), 
@@ -71,7 +71,7 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
                          column(3,
                                 numericInput(ns("g"),
                                              label = "-g (Genome Size)",
-                                             value = 250000,
+                                             value = egl(),
                                              min = 1
                                 ),
                                 

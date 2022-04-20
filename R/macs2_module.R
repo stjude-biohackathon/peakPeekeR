@@ -4,7 +4,7 @@ macs2UI <- function(id) {
   shiny::uiOutput(ns("macs2"))
 }
 
-macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_track, ctrl_track = NULL) {
+macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_track, ctrl_track = NULL, egl) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -18,7 +18,7 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                        ctrl_bam = ctrl_bam(), 
                        f = isolate(input$f), 
                        broad = isolate(input$broad), 
-                       g = isolate(input$g), 
+                       g = egl(), 
                        extsize = isolate(input$extsize), 
                        shift = isolate(input$shift), 
                        q = isolate(input$q), 
@@ -82,7 +82,7 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                 column(3,
                                        numericInput(ns("g"),
                                                     label = "g",
-                                                    value = 2700000000,
+                                                    value = egl(),
                                                     min = 1
                                        ),
                                        numericInput(ns("min.length"),
@@ -176,7 +176,7 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
   
   # Add args that will always have a value.
   args <- c(args, "-f", f, "-g", g, "--nomodel", "--extsize", extsize, "--shift", shift, 
-            "--slocal", slocal, "--llocal", llocal, "-q", q)
+            "--slocal", slocal, "--llocal", llocal)
   
   # Add optional/dependent args.
   if (broad) {
@@ -200,6 +200,8 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
   
   if (p != 1) {
     args <- c(args, "-p", p)
+  } else {
+    args <- c(args, "-q", q)
   }
   
   cl <- basiliskStart(env_macs2)
