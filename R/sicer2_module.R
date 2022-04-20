@@ -4,7 +4,7 @@ sicer2UI <- function(id) {
   shiny::uiOutput(ns("sicer2"))
 }
 # requires bedtools to use BAM files directly 
-sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_track, ctrl_track = NULL) {
+sicer2Server <- function(id, trt_bed, ctrl_bed = NULL, chrom, start, end, trt_track, ctrl_track = NULL) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -17,8 +17,8 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
         egf <- (end() - start()) / 3088286401
         
         # Peak calling function.
-        .sicer2_calling(trt_bam = trt_bam(), 
-                        ctrl_bam = ctrl_bam(), 
+        .sicer2_calling(trt_bed = trt_bed(), 
+                        ctrl_bed = ctrl_bed(), 
                         s = "hg38", 
                         rt = isolate(input$rt),
                         w = isolate(input$w), 
@@ -122,39 +122,27 @@ sicer2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tr
 }
 
 # SICER2 peak calling function.
-.sicer2_calling <- function(trt_bam, ctrl_bam, s, rt, w, f, egf, 
+.sicer2_calling <- function(trt_bed, ctrl_bed, s, rt, w, f, egf, 
                             fdr, g, e, outdir) {
   
-  args <- c("-t", paste0(trt_bam,".bed"), "-o", outdir)
+  # Add args that will always have a value. 
+  args <- c("-t", trt_bed, "-o", outdir, "-s", s, "-rt", rt, "-w", w, "-f", f, "-egf", egf, "-fdr", fdr, "-g", g, "-e", e)
   
   # Add control bam if present.
-  if (!is.null(ctrl_bam)) {
-    args <- c(args, "-c", paste0(ctrl_bam,".bed"))
+  if (!is.null(ctrl_bed)) {
+    args <- c(args, "-c", ctrl_bed)
   }
-  
-  
-  # Add args that will always have a value. 
-  args <- c(args, "-s", s, "-rt", rt, "-w", w, "-f", f, "-egf", egf, "-fdr", fdr, "-g", g, "-e", e)
   
   cl <- basiliskStart(env_sicer2)
-  # bamtobed, sicer2 breaks when trying to do this itself.
-  # TODO move outside this module to file utilities function.
-  basiliskRun(cl, function(calling.args) {
-    system2("bedtools", args = calling.args)
-  }, calling.args=c("bamtobed", "-i", trt_bam, ">", paste0(trt_bam, ".bed")))
-  
-  if (!is.null(ctrl_bam)) {
-    basiliskRun(cl, function(calling.args) {
-      system2("bedtools", args = calling.args)
-    }, calling.args=c("bamtobed", "-i", ctrl_bam, ">", paste0(ctrl_bam, ".bed")))
-  }
   
   basiliskRun(cl, function(calling.args) {
     system2("sicer", args = calling.args)
   }, calling.args=args)
   basiliskStop(cl)
   
-  outfile <- paste0(trt_bam, "-W200-G600.scoreisland")
+  tbed <- gsub(".bed", "", trt_bed)
+
+  outfile <- paste0(tbed, "-W", w, "-G", g, ".scoreisland")
   
   full.cmd <- paste("sicer", args)
   

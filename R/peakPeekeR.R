@@ -99,6 +99,12 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
       .qname_sort_bams(trt_bam = bams()$trt, ctrl_bam = bams()$ctrl)
     })
     
+    # bamtobed, sicer2 breaks when trying to do this itself.
+    beds <- reactive({
+      req(bams)
+      .bamtobed(trt_bam = bams()$trt, ctrl_bam = bams()$ctrl)
+    })
+    
     sig.tracks <- reactive({
       bs <- BSgenome.Hsapiens.UCSC.hg38
       
@@ -210,7 +216,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           ui = sicer2UI(id)
         )
         
-        sicer2Server(id, trt_bam = reactive(bams()$trt), ctrl_bam = reactive(bams()$ctrl), 
+        sicer2Server(id, trt_bed = reactive(beds()$trt), ctrl_bed = reactive(beds()$ctrl), 
                      chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                      end = reactive(input$plot.end),
                      trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))

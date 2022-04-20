@@ -45,3 +45,26 @@
   
   return(list("trt" = trt_sub, "ctrl" = ctrl_sub))
 }
+
+.bamtobed <- function(trt_bam, ctrl_bam = NULL) {
+  
+  trt_bed <- paste0(trt_bam, ".bed")
+  ctrl_bed <- NULL
+  
+  cl <- basiliskStart(env_sicer2)
+  
+  basiliskRun(cl, function(calling.args) {
+    system2("bedtools", args = calling.args)
+  }, calling.args=c("bamtobed", "-i", trt_bam, ">", trt_bed))
+  
+  if (!is.null(ctrl_bam)) {
+    ctrl_bed <- paste0(ctrl_bam, ".bed")
+    basiliskRun(cl, function(calling.args) {
+      system2("bedtools", args = calling.args)
+    }, calling.args=c("bamtobed", "-i", ctrl_bam, ">", ctrl_bed))
+  }
+  
+  basiliskStop(cl)
+  
+  return(list("trt" = trt_bed, "ctrl" = ctrl_bed))
+}
