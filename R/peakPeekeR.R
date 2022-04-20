@@ -29,6 +29,12 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
                       h4 {margin: 0px;
                           padding: 0px;
                           font-weight: bold;}
+                      h3 {margin: 0px;
+                          padding: 0px;
+                          font-weight: bold;}
+                      .well {
+                          padding-top: 5px;
+                          padding-bottom: 5px;}
                       "))
     ),
     fluidRow(
@@ -48,9 +54,10 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
           
           numericInput("end",
                        label = "End Position",
-                       value = 6769097,
+                       value = 6669097,
                        min = 2
-          )
+          ),
+          actionButton("subset", "Update BAM Subsets", class='btn-info', style = "margin-top: 25px;")
         )
       )),
       column(6,
@@ -78,8 +85,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
     ),
     hr(),
     column(12, align='center',
-           actionButton("add", "Add Peak Caller Instance", icon = icon("plus"), class='btn-success')),
-    macs2UI("macs2")
+           actionButton("add", "Add Peak Caller Instance", icon = icon("plus"), class='btn-success'))
     
   )
   
@@ -90,8 +96,15 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
     })
     
     bams <- reactive({
+      input$subset
       .subset_bams(trt_bam = trt_bam, ctrl_bam = ctrl_bam, 
-                   chrom = input$chrom, start = input$start, end = input$end)
+                   chrom = isolate(input$chrom), start = isolate(input$start), end = isolate(input$end))
+    })
+    
+    # Genome length.
+    egl <- reactive({
+      input$subset
+      isolate(input$end) - isolate(input$start)
     })
     
     sorted_bams <- reactive({
@@ -162,7 +175,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         macs2Server(id, trt_bam = reactive(bams()$trt), ctrl_bam = reactive(bams()$ctrl), 
                     chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                     end = reactive(input$plot.end),
-                    trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+                    trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl), egl = reactive(egl()))
         
         observeEvent(input[[paste0(id, '-deleteButton')]], {
           removeUI(selector = sprintf('#%s', id))
@@ -200,7 +213,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         macsServer(id, trt_bam = reactive(bams()$trt), ctrl_bam = reactive(bams()$ctrl), 
                    chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                    end = reactive(input$plot.end),
-                   trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+                   trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl), egl = reactive(egl()))
         
         observeEvent(input[[paste0(id, '-deleteButton')]], {
           removeUI(selector = sprintf('#%s', id))
@@ -219,7 +232,7 @@ peakPeekeR <- function(trt_bam, ctrl_bam = NULL) {
         sicer2Server(id, trt_bed = reactive(beds()$trt), ctrl_bed = reactive(beds()$ctrl), 
                      chrom = reactive(input$plot.chrom), start = reactive(input$plot.start), 
                      end = reactive(input$plot.end),
-                     trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl))
+                     trt_track = reactive(sig.tracks()$trt), ctrl_track = reactive(sig.tracks()$ctrl), egl = reactive(egl()))
         
         observeEvent(input[[paste0(id, '-deleteButton')]], {
           removeUI(selector = sprintf('#%s', id))
