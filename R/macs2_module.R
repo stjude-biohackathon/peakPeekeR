@@ -52,11 +52,13 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
         
         if (!is.null(ctrl_track())) {
           tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), MACS2 = tr)
+          heights <- c(0.4,0.8,0.4)
         } else {
           tracks <- c(Treat = trt_track(), MACS2 = tr)
+          heights <- c(0.8,0.4)
         }
         
-        tracks(tracks, heights = c(0.4,0.8,0.5)) + theme_clear()
+        tracks(tracks, heights = heights) + theme_clear()
       })
       
       output[["macs2"]] <- renderUI({
@@ -80,11 +82,6 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                          ),
                          column(7,
                                 column(3,
-                                       numericInput(ns("g"),
-                                                    label = "g",
-                                                    value = egl(),
-                                                    min = 1
-                                       ),
                                        numericInput(ns("min.length"),
                                                     label = "min-length",
                                                     value = 0
@@ -93,6 +90,14 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                                     label = "slocal",
                                                     value = 1000
                                        ),
+                                       checkboxInput(ns("no.lambda"),
+                                                     label = "nolambda",
+                                                     value = FALSE
+                                       ),
+                                       checkboxInput(ns("broad"),
+                                                     label = "broad",
+                                                     value = FALSE
+                                       )
                                 ),
                                 column(3,
                                        numericInput(ns("extsize"),
@@ -135,14 +140,6 @@ macs2Server <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_tra
                                                     label = "q",
                                                     value = 0.05,
                                                     min = 0.00000000000001
-                                       ),
-                                       checkboxInput(ns("no.lambda"),
-                                                     label = "nolambda",
-                                                     value = FALSE
-                                       ),
-                                       checkboxInput(ns("broad"),
-                                                     label = "broad",
-                                                     value = FALSE
                                        ),
                                        div(
                                          actionButton(ns("run"), label = "Run MACS2", class='btn-success', style='margin-top:20px;'), style="float:right;"

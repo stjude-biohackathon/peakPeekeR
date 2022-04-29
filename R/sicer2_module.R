@@ -48,11 +48,13 @@ sicer2Server <- function(id, trt_bed, ctrl_bed = NULL, chrom, start, end, trt_tr
         
         if (!is.null(ctrl_track())) {
           tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), SICER2 = tr)
+          heights <- c(0.4,0.8,0.4)
         } else {
           tracks <- c(Treat = trt_track(), SICER2 = tr)
+          heights <- c(0.8,0.4)
         }
         
-        tracks(tracks, heights = c(0.4,0.8,0.4)) + theme_clear()
+        tracks(tracks, heights = heights) + theme_clear()
       })
       
       output[["sicer2"]] <- renderUI({

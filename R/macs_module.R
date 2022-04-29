@@ -42,11 +42,15 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
         
         if (!is.null(ctrl_track())) {
           tracks <- c(Ctrl = ctrl_track(), Treat = trt_track(), MACS = tr)
+          heights <- c(0.4,0.8,0.4)
         } else {
           tracks <- c(Treat = trt_track(), MACS = tr)
+          heights <- c(0.8,0.4)
         }
         
-        tracks(tracks, heights = c(0.4,0.8,0.4)) + theme_clear()
+        
+        
+        tracks(tracks, heights = heights) + theme_clear()
       })
       
       output[["macs"]] <- renderUI({
@@ -69,12 +73,11 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
                                 plotOutput(ns("peaks"), height = 200)
                          ),
                          column(3,
-                                numericInput(ns("g"),
-                                             label = "-g (Genome Size)",
-                                             value = egl(),
-                                             min = 1
+                                numericInput(ns("p"),                         
+                                             label = "-p",
+                                             value = 0.2,
+                                             step = 0.001
                                 ),
-                                
                                 numericInput(ns("slocal"),
                                              label = "--slocal",
                                              value = 1000
@@ -91,11 +94,6 @@ macsServer <- function(id, trt_bam, ctrl_bam = NULL, chrom, start, end, trt_trac
                                 ),
                          ),
                          column(2,
-                                numericInput(ns("p"),                         
-                                             label = "-p",
-                                             value = 0.2,
-                                             step = 0.001
-                                ),
                                 checkboxInput(ns("no.lambda"),
                                               label = "--nolambda",
                                               value = FALSE
